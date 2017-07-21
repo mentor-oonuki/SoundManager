@@ -5,9 +5,6 @@ using UnityEngine;
 public class SoundManager : SingletonMonoBehaviour<SoundManager> {
 
 	[SerializeField]
-	private AudioSource audioSource;
-
-	[SerializeField]
 	private List<AudioClip> audioClipList = new List<AudioClip>(); 
 
 
@@ -18,14 +15,49 @@ public class SoundManager : SingletonMonoBehaviour<SoundManager> {
 
 		if (go != null)
 		{
-			AudioSource audioSource = go.GetComponent<AudioSource>();
-			audioSource.PlayOneShot(clip);
+			StartCoroutine(PlayCoroutine(clip, go));
 		}
 		else
 		{
-			audioSource.PlayOneShot(clip);
+			StartCoroutine(PlayCoroutine(clip, gameObject));
 		}
 	}
+
+	// 音を遅延再生する
+	public void PlayDelayed(int number, float delay, GameObject go = null)
+	{
+		AudioClip clip = audioClipList[number];
+
+		if (go != null)
+		{
+			StartCoroutine(PlayDelayedCoroutine(clip, delay, go));
+		}
+		else
+		{
+			StartCoroutine(PlayDelayedCoroutine(clip, delay, gameObject));
+		}
+
+	}
+
+	// 音を再生する コルーチン
+	private IEnumerator PlayCoroutine(AudioClip clip, GameObject go)
+	{
+		AudioSource audioSource = go.AddComponent<AudioSource>();
+		audioSource.PlayOneShot(clip);
+		yield return new WaitWhile(() => audioSource.isPlaying);
+		Destroy(audioSource);
+	}
+
+	// 音を遅延再生する コルーチン
+	private IEnumerator PlayDelayedCoroutine(AudioClip clip, float delay, GameObject go)
+	{
+		AudioSource audioSource = go.AddComponent<AudioSource>();
+		audioSource.clip = clip;
+		audioSource.PlayDelayed(delay);
+		yield return new WaitWhile(() => audioSource.isPlaying);
+		Destroy(audioSource);
+	}
+
 
 	private void Start()
 	{

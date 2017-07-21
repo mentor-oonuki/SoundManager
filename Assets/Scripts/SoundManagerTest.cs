@@ -9,7 +9,8 @@ public class SoundManagerTest : MonoBehaviour {
 
 	public void OnClick()
 	{
-		SoundManager.Instance.Play(Number);
+		SoundManager.Instance.Play(0);
+		SoundManager.Instance.PlayDelayed(1, 0.2f);
 	}
 
 }
